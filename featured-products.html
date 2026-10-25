@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>منتجات مُختارة</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--card:#fff;--soft:#f4f5f7;--text:#1d2433;--muted:#6b7280;--line:#e3e6eb;--blue:#2c56a0;--orange:#ec7330;--sky:#5bc8ee;--green:#3d8658;--red:#cc454c;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12161f;--card:#1b212d;--soft:#232a38;--text:#eef1f6;--muted:#9aa3b2;--line:#2f3748}}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:'Cairo',Tahoma,Arial,sans-serif;line-height:1.6}
+.wrap{max-width:560px;margin:0 auto;padding:20px 16px 40px}
+.view{display:none}.view.on{display:block}
+h1{font-size:2.2rem;margin:.6rem 0 0;text-align:center}
+.tag{text-align:center;font-size:1.3rem;margin:.2rem 0}
+.sub{text-align:center;color:var(--muted);margin:.8rem 0 1.4rem}
+hr{border:0;border-top:1px solid var(--line);margin:1.2rem 0}
+.btn{display:block;width:100%;border:0;border-radius:999px;padding:14px;font:600 1.1rem 'Cairo',Tahoma,sans-serif;color:#fff;text-align:center;text-decoration:none;cursor:pointer;margin-bottom:14px}
+.btn:focus-visible,.chip:focus-visible,.shop:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+.b1{background:var(--blue)}.b2{background:var(--red)}.b3{background:var(--green)}.b4{background:var(--orange);color:#1d2433}.b5{background:var(--sky);color:#1d2433}
+.row{display:flex;gap:12px}.row .btn{flex:1}
+.top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.back{background:var(--soft);color:var(--text);border:0;border-radius:999px;padding:8px 16px;font:600 1rem 'Cairo',sans-serif;cursor:pointer}
+.top h2{margin:0;font-size:1.4rem}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:12px}
+.chip{flex:none;border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:999px;padding:6px 14px;font:600 .95rem 'Cairo',sans-serif;cursor:pointer}
+.chip.on{background:var(--text);color:var(--bg);border-color:var(--text)}
+.card{background:var(--card);border-radius:14px;overflow:hidden;margin-bottom:18px;box-shadow:0 1px 6px rgba(0,0,0,.08)}
+.img{height:190px;display:flex;align-items:center;justify-content:center;font-size:4.5rem;background:var(--soft)}
+.img img{max-width:100%;max-height:100%;object-fit:contain}
+.info{padding:14px 16px 16px}
+.info h3{margin:0 0 6px;font-size:1.15rem}
+.cat{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:1px 12px;font-size:.85rem;margin-bottom:8px}
+.desc{color:var(--muted);margin:0 0 12px;font-size:.95rem}
+.shop{display:flex;align-items:center;justify-content:center;gap:10px;border:2px solid var(--text);border-radius:999px;padding:9px;margin-top:8px;color:var(--text);text-decoration:none;font-weight:600}
+.dot{font-size:.8rem;font-weight:700;padding:2px 8px;border-radius:4px;color:#fff}
+.shein{background:#111}.ali{background:#d9441e}.temu{background:#ec7330}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<section class="view on" id="home">
+  <h1>WestPost</h1>
+  <p class="tag">البريد علينا والخصم إلك</p>
+  <p class="sub">اطلب من أي موقع بالعالم وبنزودك بعنوان البريد الخاص فينا</p>
+  <hr>
+  <a class="btn b1" href="#">تسجيل الدخول / تسجيل حساب جديد</a>
+  <a class="btn b2" href="#">اضغط هنا لتفعيل خصم شي ان</a>
+  <div class="row">
+    <a class="btn b4" href="#">العناوين</a>
+    <a class="btn b3" href="#">تتبع طردك</a>
+  </div>
+  <button class="btn b5" id="open">منتجات مُختارة</button>
+</section>
+
+<section class="view" id="products">
+  <div class="top"><button class="back" id="back">رجوع</button><h2>منتجات مُختارة</h2></div>
+  <div class="chips" id="chips"></div>
+  <div id="list"></div>
+</section>
+
+</div>
+<script>
+// عدّل المنتجات هون: ضع رابط الصورة في image، وروابط المتاجر في links
+var PRODUCTS=[
+ {name:"برايمر هيدراتينغ من SHEGLAM",cat:"الجمال والعناية",icon:"💄",image:"",desc:"برايمر هيدراتينغ من SHEGLAM، مناسب للنساء والفتيات.",links:{shein:"https://www.shein.com"}},
+ {name:"مقبض تصوير مع بلوتوث و اضاءة",cat:"ادوات التصوير بالهاتف",icon:"📱",image:"",desc:"مقبض تصوير مغناطيسي مع زر بلوتوث وإضاءة للسيلفي.",links:{ali:"https://www.aliexpress.com",shein:"https://www.shein.com",temu:"https://www.temu.com"}}
+];
+var STORES={shein:["تسوّق من شي ان","SHEIN","shein"],ali:["تسوّق من علي اكسبرس","AliExpress","ali"],temu:["تسوّق من تيمو","TEMU","temu"]};
+var home=document.getElementById('home'),prod=document.getElementById('products'),list=document.getElementById('list'),chips=document.getElementById('chips'),cur='الكل';
+function show(v){home.classList.toggle('on',v==='home');prod.classList.toggle('on',v==='products');window.scrollTo(0,0)}
+function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}
+function render(){
+  var cats=['الكل'].concat(PRODUCTS.map(function(p){return p.cat}).filter(function(c,i,a){return a.indexOf(c)===i}));
+  chips.innerHTML=cats.map(function(c){return '<button class="chip'+(c===cur?' on':'')+'" data-c="'+esc(c)+'">'+esc(c)+'</button>'}).join('');
+  list.innerHTML=PRODUCTS.filter(function(p){return cur==='الكل'||p.cat===cur}).map(function(p){
+    var im=p.image?'<img src="'+esc(p.image)+'" alt="'+esc(p.name)+'">':p.icon;
+    var ls=Object.keys(p.links).map(function(k){var s=STORES[k];return '<a class="shop" target="_blank" rel="noopener" href="'+esc(p.links[k])+'">'+s[0]+' <span class="dot '+s[2]+'">'+s[1]+'</span></a>'}).join('');
+    return '<article class="card"><div class="img">'+im+'</div><div class="info"><h3>'+esc(p.name)+'</h3><span class="cat">'+esc(p.cat)+'</span><p class="desc">'+esc(p.desc)+'</p>'+ls+'</div></article>';
+  }).join('');
+}
+chips.addEventListener('click',function(e){var c=e.target.getAttribute('data-c');if(c){cur=c;render()}});
+document.getElementById('open').onclick=function(){show('products');location.hash='products'};
+document.getElementById('back').onclick=function(){show('home');location.hash='home'};
+function route(){show(location.hash==='#products'?'products':'home')}
+window.addEventListener('hashchange',route);render();route();
+</script>
+</body>
+</html>
