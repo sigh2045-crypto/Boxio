@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Boxio - حساب جديد</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f5f6;--card:#fff;--text:#1b1c1f;--muted:#6b6e76;--line:#cfd2d8;--btn:#1b1c1f;--btntext:#fff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121316;--card:#1d1f24;--text:#f1f1f3;--muted:#9a9ea8;--line:#3a3e47;--btn:#f1f1f3;--btntext:#1b1c1f}}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);font-family:'Cairo',Tahoma,Arial,sans-serif}
+header{background:#1b1c1f;padding:calc(14px + env(safe-area-inset-top,0px)) 16px 14px;display:flex;justify-content:center}
+.logo{display:flex;align-items:center;gap:8px;direction:ltr;font:700 1.5rem 'Montserrat','Cairo',Arial,sans-serif;letter-spacing:.04em;color:#fff;text-decoration:none}
+.logo svg{width:28px;height:28px}
+main{max-width:460px;margin:0 auto;padding:24px 16px calc(32px + env(safe-area-inset-bottom,0px))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px 18px;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+h1{margin:0 0 6px;text-align:center;font-size:1.6rem;font-weight:600}
+label{display:block;margin:14px 0 6px}
+.hint{color:var(--muted);font-size:.85rem}
+.warn{color:#c0392b;font-size:.88rem;margin:14px 0 6px}
+input,select{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;font:1rem 'Cairo',sans-serif;background:var(--card);color:var(--text)}
+input:focus-visible,select:focus-visible{outline:3px solid #ec7330;outline-offset:1px}
+.btn{width:100%;margin-top:22px;border:0;border-radius:10px;background:var(--btn);color:var(--btntext);padding:13px;font:600 1.1rem 'Cairo',sans-serif;cursor:pointer}
+.btn:focus-visible{outline:3px solid #ec7330;outline-offset:2px}
+.msg{margin:14px 0 0;padding:10px;border-radius:10px;text-align:center;font-size:.95rem}
+.err{background:#fde8e8;color:#8a1c1c}.info{background:#fff3cd;color:#664d03}
+.msg[hidden]{display:none}
+.login{display:block;text-align:center;margin-top:20px;color:var(--text)}
+</style>
+</head>
+<body>
+<header>
+  <a class="logo" href="index.html" aria-label="Boxio">
+    <svg viewBox="0 0 32 32" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"><path d="M16 3 4 9v14l12 6 12-6V9L16 3Z"/><path d="M4 9l12 6 12-6M16 15v14"/></svg>
+    BOXIO
+  </a>
+</header>
+<main>
+  <div class="card">
+    <h1>حساب جديد</h1>
+    <form id="f" novalidate>
+      <label for="email">البريد الإلكتروني</label>
+      <input type="email" id="email" autocomplete="email" required>
+
+      <label for="fn">الاسم الأول <span class="hint">(الاسم بالإنجليزي)</span></label>
+      <input type="text" id="fn" autocomplete="given-name" required>
+
+      <label for="ln">اسم العائلة <span class="hint">(الاسم بالإنجليزي)</span></label>
+      <input type="text" id="ln" autocomplete="family-name" required>
+
+      <label for="ph">رقم الهاتف</label>
+      <input type="tel" id="ph" autocomplete="tel" inputmode="tel" required>
+
+      <label for="city">المدينة</label>
+      <select id="city" required>
+        <option value="">اختر المدينة</option>
+        <option>القدس</option><option>رام الله</option><option>البيرة</option><option>نابلس</option><option>الخليل</option><option>بيت لحم</option><option>جنين</option><option>طولكرم</option><option>قلقيلية</option><option>أريحا</option><option>سلفيت</option><option>طوباس</option><option>أخرى</option>
+      </select>
+
+      <label for="vil">القرية <span class="hint">(إن وجدت)</span></label>
+      <input type="text" id="vil">
+
+      <div class="warn">الرجاء كتابة تفاصيل تساعد بالوصول للعنوان، مثلاً: بجانب سوبر ماركت ... أو بالقرب من ...</div>
+      <input type="text" id="addr" placeholder="العنوان بالكامل" autocomplete="street-address" required>
+
+      <label for="ref">كود الإحالة <span class="hint">(اختياري)</span></label>
+      <input type="text" id="ref" placeholder="اكتبه هون لو معك كود إحالة من صديق">
+
+      <label for="pw">الرقم السري <span class="hint">(6 أحرف على الأقل)</span></label>
+      <input type="password" id="pw" autocomplete="new-password" required>
+
+      <label for="pw2">تأكيد الرقم السري</label>
+      <input type="password" id="pw2" autocomplete="new-password" required>
+
+      <button class="btn" type="submit">حساب جديد</button>
+      <div class="msg" id="msg" hidden></div>
+    </form>
+    <a class="login" href="login.html">تسجيل الدخول</a>
+  </div>
+</main>
+<script>
+// هاد الشكل والتحقق من الخانات فقط. حفظ الحساب الحقيقي بحاجة ربط بقاعدة بيانات (Firebase).
+var f=document.getElementById('f'),m=document.getElementById('msg');
+function show(t,c){m.textContent=t;m.className='msg '+c;m.hidden=false}
+f.addEventListener('submit',function(e){
+  e.preventDefault();
+  var v=function(i){return document.getElementById(i).value.trim()};
+  if(!v('email')||!v('fn')||!v('ln')||!v('ph')||!v('city')||!v('addr')||!document.getElementById('pw').value)return show('الرجاء تعبئة كل الخانات المطلوبة','err');
+  if(!/^\S+@\S+\.\S+$/.test(v('email')))return show('البريد الإلكتروني غير صحيح','err');
+  if(document.getElementById('pw').value.length<6)return show('الرقم السري لازم يكون 6 أحرف على الأقل','err');
+  if(document.getElementById('pw').value!==document.getElementById('pw2').value)return show('الرقم السري وتأكيده مش متطابقين','err');
+  show('الخانات سليمة، لكن إنشاء الحساب غير مفعّل بعد: بحاجة ربط الموقع بقاعدة بيانات','info');
+});
+</script>
+</body>
+</html>
