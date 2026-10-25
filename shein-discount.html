@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Boxio - خصم شي ان</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f5f6;--text:#1b1c1f;--muted:#6b6e76}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121316;--text:#f1f1f3;--muted:#9a9ea8}}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);font-family:'Cairo',Tahoma,Arial,sans-serif;display:flex;flex-direction:column}
+header{background:#1b1c1f;padding:calc(14px + env(safe-area-inset-top,0px)) 16px 14px;display:flex;justify-content:space-between;align-items:center}
+.logo{display:flex;align-items:center;gap:8px;direction:ltr;font:700 1.5rem 'Montserrat','Cairo',Arial,sans-serif;letter-spacing:.04em;color:#fff;text-decoration:none}
+.logo svg{width:28px;height:28px}
+.back{color:#fff;text-decoration:none;border:1px solid #55585f;border-radius:999px;padding:5px 14px;font-weight:600;font-size:.95rem}
+main{flex:1;display:flex;flex-direction:column;justify-content:center;max-width:520px;width:100%;margin:0 auto;padding:24px 16px calc(24px + env(safe-area-inset-bottom,0px))}
+p{text-align:center;color:var(--muted);margin:0 0 20px}
+.btn{display:block;background:#cc454c;color:#fff;text-align:center;text-decoration:none;font:600 1.2rem 'Cairo',sans-serif;border-radius:999px;padding:16px}
+.btn:focus-visible,.back:focus-visible{outline:3px solid var(--text);outline-offset:2px}
+</style>
+</head>
+<body>
+<header>
+  <a class="back" href="index.html">رجوع</a>
+  <a class="logo" href="index.html" aria-label="Boxio">
+    <svg viewBox="0 0 32 32" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"><path d="M16 3 4 9v14l12 6 12-6V9L16 3Z"/><path d="M4 9l12 6 12-6M16 15v14"/></svg>
+    BOXIO
+  </a>
+</header>
+<main>
+  <p>اضغط الزر لتفتح شي ان وتتسوق</p>
+  <a class="btn" target="_blank" rel="noopener" href="https://m.shein.com/us/?ref=us&rep=dir&ret=mus">اضغط هنا لتفعيل خصم شي ان</a>
+</main>
+</body>
+</html>
