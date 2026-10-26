@@ -137,6 +137,21 @@ const auth = getAuth(app);
 const db   = getFirestore(app);
 
 
+// رابط Google Sheets (Apps Script) - كل تسجيل جديد بينبعت للجدول كمان
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbxUsKb8FgOMydaTZFUjccJjiKMaLNx11clVC8QzYtb0q8-eN2hQ-NeR6zSxPZWqpMAxZA/exec";
+
+function sendToSheet(d){
+  if (!SHEET_URL) return;
+  try {
+    fetch(SHEET_URL, {
+      method: "POST", mode: "no-cors", keepalive: true,
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ email:d.email, first:d.first, last:d.last, phone:d.phone,
+                             city:d.city, village:d.village, address:d.address, ref:d.ref })
+    }).catch(() => {});
+  } catch(e) { console.error(e); }
+}
+
 const $ = id => document.getElementById(id);
 let busy = false;
 
@@ -196,6 +211,7 @@ async function doLogin(email, password, remember){
 async function doSignup(d){
   await setPersistence(auth, browserLocalPersistence);
   const cred = await createUserWithEmailAndPassword(auth, d.email, d.password);
+  sendToSheet(d);
   try {
     await setDoc(doc(db, "users", cred.user.uid), {
       email: d.email, first: d.first, last: d.last, phone: d.phone,
