@@ -20,6 +20,8 @@ label{display:block;margin:14px 0 6px;font-size:15px;font-weight:500}
 input,textarea{width:100%;padding:12px;border:1px solid var(--line);border-radius:8px;background:transparent;color:var(--ink);font:400 16px Tajawal,sans-serif}
 input:focus,textarea:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 .ltr{direction:ltr;text-align:right}
+.remember{display:flex;align-items:center;gap:10px;margin:16px 0 0;font-size:15px;cursor:pointer}
+.remember input{width:22px;height:22px;padding:0;accent-color:var(--accent)}
 .msg{min-height:22px;margin-top:12px;font-size:14px;color:var(--err)}
 .msg.ok{color:var(--ink)}
 .go{width:100%;margin-top:8px;padding:14px;border:0;border-radius:8px;background:var(--accent);color:#14213d;font:800 17px Tajawal,sans-serif;cursor:pointer}
@@ -41,6 +43,7 @@ input:focus,textarea:focus,button:focus-visible{outline:2px solid var(--accent);
     <input class="ltr" id="l-email" type="email" autocomplete="email" required>
     <label for="l-pass">الرقم السري</label>
     <input class="ltr" id="l-pass" type="password" autocomplete="current-password" required>
+    <label class="remember"><input type="checkbox" id="l-remember"> تذكرني</label>
     <div class="msg" id="l-msg" role="alert"></div>
     <button class="go" type="submit">تسجيل الدخول</button>
   </form>
@@ -82,10 +85,17 @@ function show(tab){
 $("t-login").onclick = () => show("login");
 $("t-signup").onclick = () => show("signup");
 
+// تعبئة الإيميل تلقائياً إذا المستخدم اختار "تذكرني" سابقاً (الإيميل فقط، بدون الرقم السري)
+try {
+  const saved = localStorage.getItem("boxio_email");
+  if (saved) { $("l-email").value = saved; $("l-remember").checked = true; }
+} catch(e) {}
+
 /* ===== الربط مع نظام الحسابات =====
    لازم هاي الدوال تتصل بخدمة حقيقية (Firebase Auth أو Supabase).
    لا تخزّن الرقم السري في Google Sheets أو localStorage. */
-async function doLogin(email, password){
+async function doLogin(email, password, remember){
+  // remember = true → خلّي الجلسة محفوظة (Firebase: browserLocalPersistence)، وإلا browserSessionPersistence
   throw new Error("لم يتم ربط تسجيل الدخول بعد");
 }
 async function doSignup(data){
@@ -104,7 +114,12 @@ $("login").addEventListener("submit", e => {
   e.preventDefault();
   const email = $("l-email").value.trim(), pass = $("l-pass").value;
   if(!email || !pass){ $("l-msg").textContent = "أدخل البريد والرقم السري"; return; }
-  run($("login"), $("l-msg"), () => doLogin(email, pass));
+  const remember = $("l-remember").checked;
+  try {
+    if (remember) localStorage.setItem("boxio_email", email);
+    else localStorage.removeItem("boxio_email");
+  } catch(e) {}
+  run($("login"), $("l-msg"), () => doLogin(email, pass, remember));
 });
 
 $("signup").addEventListener("submit", e => {
