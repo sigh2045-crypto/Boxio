@@ -22,6 +22,7 @@ input:focus,textarea:focus,button:focus-visible{outline:2px solid var(--accent);
 .ltr{direction:ltr;text-align:right}
 .remember{display:flex;align-items:center;gap:10px;margin:16px 0 0;font-size:15px;cursor:pointer}
 .remember input{width:22px;height:22px;padding:0;accent-color:var(--accent)}
+.link{display:block;width:100%;margin-top:14px;background:none;border:0;color:var(--muted);font:500 14px Tajawal,sans-serif;text-decoration:underline;cursor:pointer}
 .msg{min-height:22px;margin-top:12px;font-size:14px;color:var(--err)}
 .msg.ok{color:var(--ink)}
 .go{width:100%;margin-top:8px;padding:14px;border:0;border-radius:8px;background:var(--accent);color:#14213d;font:800 17px Tajawal,sans-serif;cursor:pointer}
@@ -46,6 +47,7 @@ input:focus,textarea:focus,button:focus-visible{outline:2px solid var(--accent);
     <label class="remember"><input type="checkbox" id="l-remember"> تذكرني</label>
     <div class="msg" id="l-msg" role="alert"></div>
     <button class="go" type="submit">تسجيل الدخول</button>
+    <button class="link" type="button" id="l-forgot">نسيت الرقم السري؟</button>
   </form>
 
   <form id="signup" novalidate hidden>
@@ -72,10 +74,31 @@ input:focus,textarea:focus,button:focus-visible{outline:2px solid var(--accent);
   <a class="wa" href="https://wa.me/972512006950">تواصل معنا عبر واتساب</a>
 </main>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, setPersistence,
+         browserLocalPersistence, browserSessionPersistence, onAuthStateChanged, sendPasswordResetEmail }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, doc, setDoc, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyD8-5FFBCE5WHAEai3sPMAdUwAgIg-QaMQ",
+  authDomain: "boxio-7bbde.firebaseapp.com",
+  projectId: "boxio-7bbde",
+  storageBucket: "boxio-7bbde.firebasestorage.app",
+  messagingSenderId: "833134820214",
+  appId: "1:833134820214:web:37083cab6980150e1e5857"
+};
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
 const APP_URL = "app.html"; // ← رابط التطبيق بعد الدخول
 
 const $ = id => document.getElementById(id);
+let busy = false;
+
 function show(tab){
   const login = tab === "login";
   $("login").hidden = !login; $("signup").hidden = login;
@@ -85,28 +108,54 @@ function show(tab){
 $("t-login").onclick = () => show("login");
 $("t-signup").onclick = () => show("signup");
 
-// تعبئة الإيميل تلقائياً إذا المستخدم اختار "تذكرني" سابقاً (الإيميل فقط، بدون الرقم السري)
+// تعبئة الإيميل تلقائياً إذا المستخدم اختار "تذكرني" سابقاً
 try {
   const saved = localStorage.getItem("boxio_email");
   if (saved) { $("l-email").value = saved; $("l-remember").checked = true; }
 } catch(e) {}
 
-/* ===== الربط مع نظام الحسابات =====
-   لازم هاي الدوال تتصل بخدمة حقيقية (Firebase Auth أو Supabase).
-   لا تخزّن الرقم السري في Google Sheets أو localStorage. */
+// إذا المستخدم مسجل دخول من قبل، ادخله مباشرة على التطبيق
+// (افتح الصفحة بالرابط ...#stay إذا بدك تشوف صفحة الدخول وأنت مسجل)
+onAuthStateChanged(auth, user => {
+  if (user && !busy && location.hash !== "#stay") location.href = APP_URL;
+});
+
+const ERRORS = {
+  "auth/invalid-credential": "الإيميل أو الرقم السري غير صحيح",
+  "auth/user-not-found": "الإيميل أو الرقم السري غير صحيح",
+  "auth/wrong-password": "الإيميل أو الرقم السري غير صحيح",
+  "auth/invalid-email": "صيغة الإيميل غير صحيحة",
+  "auth/email-already-in-use": "هذا الإيميل مسجل من قبل، جرّب تسجيل الدخول",
+  "auth/weak-password": "الرقم السري ضعيف، استخدم 8 خانات على الأقل",
+  "auth/too-many-requests": "محاولات كثيرة، انتظر شوي وجرّب مرة ثانية",
+  "auth/network-request-failed": "في مشكلة بالاتصال بالإنترنت"
+};
+const friendly = e => ERRORS[e.code] || (e.code ? "صار خطأ، جرّب مرة ثانية" : e.message);
+
 async function doLogin(email, password, remember){
-  // remember = true → خلّي الجلسة محفوظة (Firebase: browserLocalPersistence)، وإلا browserSessionPersistence
-  throw new Error("لم يتم ربط تسجيل الدخول بعد");
+  await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
+  await signInWithEmailAndPassword(auth, email, password);
 }
-async function doSignup(data){
-  throw new Error("لم يتم ربط إنشاء الحساب بعد");
+
+async function doSignup(d){
+  await setPersistence(auth, browserLocalPersistence);
+  const cred = await createUserWithEmailAndPassword(auth, d.email, d.password);
+  try {
+    await setDoc(doc(db, "users", cred.user.uid), {
+      email: d.email, first: d.first, last: d.last, phone: d.phone,
+      address: d.address, ref: d.ref, createdAt: serverTimestamp()
+    });
+  } catch(e) {
+    console.error(e);
+    throw new Error("تم إنشاء حسابك لكن تعذّر حفظ بياناتك. سجّل دخول وجرّب مرة ثانية");
+  }
 }
 
 async function run(form, msgEl, fn){
   const btn = form.querySelector(".go");
-  btn.disabled = true; msgEl.className = "msg"; msgEl.textContent = "";
+  btn.disabled = true; busy = true; msgEl.className = "msg"; msgEl.textContent = "";
   try { await fn(); location.href = APP_URL; }
-  catch(e){ msgEl.textContent = e.message; }
+  catch(e){ msgEl.textContent = friendly(e); busy = false; }
   finally { btn.disabled = false; }
 }
 
@@ -120,6 +169,17 @@ $("login").addEventListener("submit", e => {
     else localStorage.removeItem("boxio_email");
   } catch(e) {}
   run($("login"), $("l-msg"), () => doLogin(email, pass, remember));
+});
+
+$("l-forgot").addEventListener("click", async () => {
+  const m = $("l-msg"), email = $("l-email").value.trim();
+  m.className = "msg";
+  if(!email){ m.textContent = "اكتب إيميلك أولاً وبعدين اضغط نسيت الرقم السري"; return; }
+  try {
+    await sendPasswordResetEmail(auth, email);
+    m.className = "msg ok";
+    m.textContent = "إذا الإيميل مسجل عندنا، رح يوصلك رابط لتعيين رقم سري جديد";
+  } catch(e){ m.textContent = friendly(e); }
 });
 
 $("signup").addEventListener("submit", e => {
