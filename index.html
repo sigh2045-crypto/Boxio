@@ -43,6 +43,15 @@ body.home{padding:0;background:#1e0a58}
 .hero p{margin:0;font-size:22px;font-weight:400;font-family:Montserrat,Tajawal,system-ui,sans-serif;color:#e6e7ea}
 .menu{padding:30px 16px 40px;display:flex;flex-direction:column;gap:22px;max-width:520px;margin:0 auto}
 .menu a{display:block;padding:20px 12px;background:#fff;color:#1e0a58;text-align:center;text-decoration:none;font-size:18px;border-radius:4px}
+.phone{display:flex;gap:8px;direction:ltr}
+.phone select{flex:none;width:47%;padding:12px 8px;border:1px solid var(--line);border-radius:8px;background:transparent;color:var(--ink);font:400 15px Tajawal,sans-serif;direction:rtl}
+.phone select option{background:var(--card);color:var(--ink)}
+.phone input{flex:1;min-width:0}
+.vbox{padding:24px 18px}
+.vbox h2{margin:0 0 12px;font-size:20px}
+.vbox p{margin:0 0 6px;font-size:15px}
+.vbox b{display:block;margin:6px 0 12px;font-size:17px;direction:ltr;text-align:right;word-break:break-all}
+.vbox .hint{color:var(--muted);margin-bottom:8px}
 [hidden]{display:none}
 </style>
 </head>
@@ -75,7 +84,14 @@ body.home{padding:0;background:#1e0a58}
     <label for="s-last">اسم العائلة (بالإنجليزي)</label>
     <input class="ltr" id="s-last" autocomplete="family-name" required>
     <label for="s-phone">رقم الهاتف</label>
-    <input class="ltr" id="s-phone" type="tel" autocomplete="tel" required>
+    <div class="phone">
+      <select id="s-cc" aria-label="مقدمة الرقم">
+        <option value="" selected disabled>اختر المقدمة</option>
+        <option value="972">00972 إسرائيلي</option>
+        <option value="970">00970 فلسطيني</option>
+      </select>
+      <input class="ltr" id="s-phone" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="5XXXXXXXX" required>
+    </div>
     <label for="s-city">المدينة</label>
     <input id="s-city" autocomplete="address-level2" required>
     <label for="s-village">القرية (اختياري)</label>
@@ -94,6 +110,23 @@ body.home{padding:0;background:#1e0a58}
   </form>
 
   <a class="wa" href="https://wa.me/972512006950">تواصل معنا عبر واتساب</a>
+</main>
+</div>
+
+<div id="verifyView" hidden>
+<header>BOXIO</header>
+<main>
+  <div class="vbox">
+    <h2>تأكيد الإيميل</h2>
+    <p>أرسلنا رابط تأكيد إلى:</p>
+    <b id="v-mail"></b>
+    <p class="hint">افتح إيميلك واضغط على الرابط (تفقّد مجلد السبام إذا ما وصلت)، وبعدها بتدخل تلقائياً.</p>
+    <div class="msg" id="v-msg" role="alert"></div>
+    <button class="go" id="v-check" type="button">تأكدت، دخّلني</button>
+    <button class="link" id="v-resend" type="button">إعادة إرسال الإيميل</button>
+    <button class="link" id="v-wrong" type="button">الإيميل غلط؟ سجّل من جديد</button>
+    <button class="link" id="v-out" type="button">تسجيل خروج</button>
+  </div>
 </main>
 </div>
 
@@ -119,7 +152,7 @@ body.home{padding:0;background:#1e0a58}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, setPersistence,
-         browserLocalPersistence, browserSessionPersistence, onAuthStateChanged, sendPasswordResetEmail, signOut }
+         browserLocalPersistence, browserSessionPersistence, onAuthStateChanged, sendPasswordResetEmail, signOut, sendEmailVerification }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore, doc, setDoc, serverTimestamp }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -134,6 +167,7 @@ const firebaseConfig = {
 };
 const app  = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+auth.languageCode = "ar"; // الإيميل بالعربي
 const db   = getFirestore(app);
 
 
@@ -178,12 +212,29 @@ try {
 } catch(e) {}
 
 // عرض صفحة الدخول أو الصفحة الرئيسية حسب حالة المستخدم
+let poll = null;
+function startPoll(){
+  if (poll) return;
+  poll = setInterval(async () => {
+    try {
+      if (!auth.currentUser) return;
+      await auth.currentUser.reload();
+      if (auth.currentUser.emailVerified) render(auth.currentUser);
+    } catch(e) {}
+  }, 4000);
+}
+function stopPoll(){ if (poll) { clearInterval(poll); poll = null; } }
+
 function render(user){
   const on = !!user;
+  const verified = on && user.emailVerified;
   $("loginView").hidden = on;
-  $("home").hidden = !on;
-  document.body.classList.toggle("home", on);
-  if (on) {
+  $("verifyView").hidden = !(on && !verified);
+  $("home").hidden = !verified;
+  document.body.classList.toggle("home", verified);
+  if (on && !verified) { $("v-mail").textContent = user.email; startPoll(); }
+  else stopPoll();
+  if (verified) {
     $("av").textContent = (user.email || "?").trim().charAt(0);
     $("mail").textContent = user.email;
   }
@@ -208,9 +259,20 @@ async function doLogin(email, password, remember){
   await signInWithEmailAndPassword(auth, email, password);
 }
 
+async function sendVerify(user){
+  const url = location.origin + location.pathname;
+  try { await sendEmailVerification(user, { url }); }
+  catch(e) {
+    if (e.code === "auth/unauthorized-continue-uri" || e.code === "auth/invalid-continue-uri")
+      await sendEmailVerification(user);
+    else throw e;
+  }
+}
+
 async function doSignup(d){
   await setPersistence(auth, browserLocalPersistence);
   const cred = await createUserWithEmailAndPassword(auth, d.email, d.password);
+  try { await sendVerify(cred.user); } catch(e) { console.error(e); }
   sendToSheet(d);
   try {
     await setDoc(doc(db, "users", cred.user.uid), {
@@ -261,13 +323,50 @@ $("signup").addEventListener("submit", e => {
   if(need){ m.textContent = "عبّي كل الخانات المطلوبة"; return; }
   if(p.length < 8){ m.textContent = "الرقم السري لازم يكون 8 خانات على الأقل"; return; }
   if(p !== $("s-pass2").value){ m.textContent = "الرقم السري وتأكيده غير متطابقين"; return; }
+  const cc = $("s-cc").value;
+  if(!cc){ m.textContent = "اختر مقدمة الرقم (إسرائيلي أو فلسطيني)"; return; }
+  let digits = $("s-phone").value.replace(/\D/g, "").replace(/^0+/, "");
+  if (digits.startsWith(cc)) digits = digits.slice(cc.length);
+  if(!/^5\d{8}$/.test(digits)){ m.textContent = "رقم الجوال غير صحيح (مثال: 0512345678)"; return; }
   run($("signup"), m, () => doSignup({
     email:$("s-email").value.trim(), first:$("s-first").value.trim(),
-    last:$("s-last").value.trim(), phone:$("s-phone").value.trim(),
+    last:$("s-last").value.trim(), phone:"00" + cc + digits,
     city:$("s-city").value.trim(), village:$("s-village").value.trim(),
     address:$("s-addr").value.trim(), ref:$("s-ref").value.trim(), password:p
   }));
 });
+
+// ===== شاشة تأكيد الإيميل =====
+$("v-check").onclick = async () => {
+  const m = $("v-msg"); m.className = "msg"; m.textContent = "";
+  try { await auth.currentUser.reload(); } catch(e) {}
+  if (auth.currentUser && auth.currentUser.emailVerified) render(auth.currentUser);
+  else m.textContent = "لسا ما تأكد الإيميل. اضغط الرابط اللي بالإيميل أولاً";
+};
+
+let cooling = false;
+$("v-resend").onclick = async () => {
+  if (cooling || !auth.currentUser) return;
+  const m = $("v-msg"), b = $("v-resend");
+  m.className = "msg"; m.textContent = "";
+  cooling = true; b.disabled = true;
+  try { await sendVerify(auth.currentUser); m.className = "msg ok"; m.textContent = "تم إرسال الإيميل من جديد"; }
+  catch(e) { m.textContent = friendly(e); }
+  let t = 60;
+  const timer = setInterval(() => {
+    b.textContent = "إعادة إرسال الإيميل (" + (--t) + ")";
+    if (t <= 0) { clearInterval(timer); b.textContent = "إعادة إرسال الإيميل"; b.disabled = false; cooling = false; }
+  }, 1000);
+};
+
+$("v-wrong").onclick = async () => {
+  const u = auth.currentUser; if (!u) return;
+  if (!confirm("رح نحذف هالحساب غير المؤكد وترجع تسجّل من جديد. متأكد؟")) return;
+  try { await u.delete(); } catch(e) { try { await signOut(auth); } catch(_) {} }
+  show("signup");
+};
+
+$("v-out").onclick = () => signOut(auth);
 </script>
 </body>
 </html>
