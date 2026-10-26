@@ -23,6 +23,7 @@ input:focus,textarea:focus,button:focus-visible{outline:2px solid var(--accent);
 .remember{display:flex;align-items:center;gap:10px;margin:16px 0 0;font-size:15px;cursor:pointer}
 .remember input{width:22px;height:22px;padding:0;accent-color:var(--accent)}
 .link{display:block;width:100%;margin-top:14px;background:none;border:0;color:var(--muted);font:500 14px Tajawal,sans-serif;text-decoration:underline;cursor:pointer}
+.showpw{margin:10px 0 0;font-size:14px;color:var(--muted)}
 .msg{min-height:22px;margin-top:12px;font-size:14px;color:var(--err)}
 .msg.ok{color:var(--ink)}
 .go{width:100%;margin-top:8px;padding:14px;border:0;border-radius:8px;background:var(--accent);color:#14213d;font:800 17px Tajawal,sans-serif;cursor:pointer}
@@ -44,6 +45,7 @@ input:focus,textarea:focus,button:focus-visible{outline:2px solid var(--accent);
     <input class="ltr" id="l-email" type="email" autocomplete="email" required>
     <label for="l-pass">الرقم السري</label>
     <input class="ltr" id="l-pass" type="password" autocomplete="current-password" required>
+    <label class="remember showpw"><input type="checkbox" data-show="l-pass"> إظهار الرقم السري</label>
     <label class="remember"><input type="checkbox" id="l-remember"> تذكرني</label>
     <div class="msg" id="l-msg" role="alert"></div>
     <button class="go" type="submit">تسجيل الدخول</button>
@@ -59,12 +61,17 @@ input:focus,textarea:focus,button:focus-visible{outline:2px solid var(--accent);
     <input class="ltr" id="s-last" autocomplete="family-name" required>
     <label for="s-phone">رقم الهاتف</label>
     <input class="ltr" id="s-phone" type="tel" autocomplete="tel" required>
+    <label for="s-city">المدينة</label>
+    <input id="s-city" autocomplete="address-level2" required>
+    <label for="s-village">القرية (اختياري)</label>
+    <input id="s-village">
     <label for="s-addr">تفاصيل تساعد بالوصول للعنوان</label>
     <textarea id="s-addr" rows="2" required placeholder="مثلاً: بجانب سوبر ماركت ... أو بالقرب من ..."></textarea>
     <label for="s-pass">الرقم السري</label>
     <input class="ltr" id="s-pass" type="password" autocomplete="new-password" minlength="8" required>
     <label for="s-pass2">تأكيد الرقم السري</label>
     <input class="ltr" id="s-pass2" type="password" autocomplete="new-password" required>
+    <label class="remember showpw"><input type="checkbox" data-show="s-pass,s-pass2"> إظهار الرقم السري</label>
     <label for="s-ref">كود الإحالة (اختياري)</label>
     <input class="ltr" id="s-ref">
     <div class="msg" id="s-msg" role="alert"></div>
@@ -94,7 +101,7 @@ const app  = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db   = getFirestore(app);
 
-const APP_URL = "app.html"; // ← رابط التطبيق بعد الدخول
+const APP_URL = "https://sites.google.com/view/boxio-store-101/%D8%A7%D9%84%D8%B5%D9%81%D8%AD%D8%A9-%D8%A7%D9%84%D8%B1%D8%A6%D9%8A%D8%B3%D9%8A%D8%A9"; // ← رابط التطبيق بعد الدخول
 
 const $ = id => document.getElementById(id);
 let busy = false;
@@ -107,6 +114,13 @@ function show(tab){
 }
 $("t-login").onclick = () => show("login");
 $("t-signup").onclick = () => show("signup");
+
+// إظهار / إخفاء الرقم السري
+document.querySelectorAll("[data-show]").forEach(cb => {
+  cb.addEventListener("change", () => {
+    cb.dataset.show.split(",").forEach(id => { $(id).type = cb.checked ? "text" : "password"; });
+  });
+});
 
 // تعبئة الإيميل تلقائياً إذا المستخدم اختار "تذكرني" سابقاً
 try {
@@ -143,7 +157,7 @@ async function doSignup(d){
   try {
     await setDoc(doc(db, "users", cred.user.uid), {
       email: d.email, first: d.first, last: d.last, phone: d.phone,
-      address: d.address, ref: d.ref, createdAt: serverTimestamp()
+      city: d.city, village: d.village, address: d.address, ref: d.ref, createdAt: serverTimestamp()
     });
   } catch(e) {
     console.error(e);
@@ -185,13 +199,14 @@ $("l-forgot").addEventListener("click", async () => {
 $("signup").addEventListener("submit", e => {
   e.preventDefault();
   const m = $("s-msg"), p = $("s-pass").value;
-  const need = ["s-email","s-first","s-last","s-phone","s-addr"].some(id => !$(id).value.trim());
+  const need = ["s-email","s-first","s-last","s-phone","s-city","s-addr"].some(id => !$(id).value.trim());
   if(need){ m.textContent = "عبّي كل الخانات المطلوبة"; return; }
   if(p.length < 8){ m.textContent = "الرقم السري لازم يكون 8 خانات على الأقل"; return; }
   if(p !== $("s-pass2").value){ m.textContent = "الرقم السري وتأكيده غير متطابقين"; return; }
   run($("signup"), m, () => doSignup({
     email:$("s-email").value.trim(), first:$("s-first").value.trim(),
     last:$("s-last").value.trim(), phone:$("s-phone").value.trim(),
+    city:$("s-city").value.trim(), village:$("s-village").value.trim(),
     address:$("s-addr").value.trim(), ref:$("s-ref").value.trim(), password:p
   }));
 });
