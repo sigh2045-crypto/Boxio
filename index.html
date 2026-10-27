@@ -278,15 +278,18 @@ const db   = getFirestore(app);
 
 
 // رابط Google Sheets (Apps Script) - كل تسجيل جديد بينبعت للجدول كمان
-const SHEET_URL = "https://script.google.com/macros/s/AKfycbyLyQRv3jxRe9OYIFkW1VPNzVtzrVWN_1RklZ6MVhZHFF4eyn3E-BfflXBEO_3oEXHx/exec";
+// النسخة الآمنة: بنبعت توكن تسجيل الدخول والسكربت بيتحقق منه
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbxnmzHuLmTftds_l6x2JOm4jK4k-zNpoNlCAluM1iDgLxp004Kvav-QbA2p3qM7zPw7/exec";
 
-function sendToSheet(d){
-  if (!SHEET_URL) return;
+async function sendToSheet(d){
+  const user = auth.currentUser;
+  if (!SHEET_URL || !user) return;
   try {
+    const idToken = await user.getIdToken();
     fetch(SHEET_URL, {
       method: "POST", mode: "no-cors", keepalive: true,
       headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({ email:d.email, first:d.first, last:d.last, phone:d.phone,
+      body: JSON.stringify({ idToken, first:d.first, last:d.last, phone:d.phone,
                              city:d.city, village:d.village, address:d.address, ref:d.ref })
     }).catch(() => {});
   } catch(e) { console.error(e); }
