@@ -3,14 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>BOXIO</title>
+<title>ZIVOX</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;800&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#eef1f6;--card:#fff;--ink:#14213d;--muted:#5c6780;--line:#d5dbe7;--accent:#f5b301;--err:#c62828}
 @media (prefers-color-scheme:dark){:root{--bg:#0e1424;--card:#171f35;--ink:#f1f4fb;--muted:#9aa6c2;--line:#2b3654;--err:#ff8a80}}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:Tajawal,system-ui,sans-serif;min-height:100vh;padding:env(safe-area-inset-top) 16px env(safe-area-inset-bottom)}
-header{max-width:440px;margin:0 auto;padding:22px 4px 14px;font-weight:800;font-size:26px;letter-spacing:3px}
+header{max-width:440px;margin:18px auto 14px;padding:10px 0;background:#000;border-radius:14px;text-align:center;line-height:0}
+header img{height:52px;max-width:100%;width:auto;display:inline-block}
 main{max-width:440px;margin:0 auto 32px;background:var(--card);border-radius:14px;border:1px solid var(--line);overflow:hidden}
 .tabs{display:grid;grid-template-columns:1fr 1fr}
 .tabs button{padding:15px 8px;border:0;background:transparent;color:var(--muted);font:500 16px Tajawal,sans-serif;cursor:pointer;border-bottom:3px solid var(--line)}
@@ -37,10 +38,9 @@ body.home{padding:0;background:#1e0a58}
 .avatar::after{content:"";position:absolute;bottom:-1px;inset-inline-end:-1px;width:12px;height:12px;border-radius:50%;background:#2e9d57;border:2px solid #1f2125}
 .mail{font-size:13px;color:#c9ccd3;direction:ltr;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:48vw}
 #out{flex:none;padding:8px 14px;border:1px solid #4a4e57;border-radius:8px;background:transparent;color:#fff;font:500 14px Tajawal,system-ui,sans-serif;cursor:pointer}
-.hero{background:linear-gradient(160deg,#2a2c31,#17181b);text-align:center;padding:48px 16px 56px}
-.hero svg{width:84px;height:84px}
-.hero h1{margin:14px 0 6px;font-size:68px;font-weight:800;letter-spacing:2px;font-family:Montserrat,Tajawal,system-ui,sans-serif}
-.hero p{margin:0;font-size:22px;font-weight:400;font-family:Montserrat,Tajawal,system-ui,sans-serif;color:#e6e7ea}
+.hero{background:#000;text-align:center;padding:40px 16px 48px;line-height:0}
+.hero img{width:min(86vw,420px);height:auto}
+.hero p{margin:14px 0 0;font-size:22px;line-height:1.4;font-weight:400;font-family:Montserrat,Tajawal,system-ui,sans-serif;color:#e6e7ea}
 .menu{padding:30px 16px 40px;display:flex;flex-direction:column;gap:22px;max-width:520px;margin:0 auto}
 .menu a{display:block;padding:20px 12px;background:#fff;color:#1e0a58;text-align:center;text-decoration:none;font-size:18px;border-radius:4px}
 .phone{display:flex;gap:8px;direction:ltr}
@@ -75,7 +75,7 @@ body.showpriv #privacyView{display:block}
 </head>
 <body>
 <div id="loginView">
-<header>BOXIO</header>
+<header><img src="logo-black.png" alt="ZIVOX"></header>
 <main>
   <div class="tabs" role="tablist">
     <button role="tab" id="t-login" aria-selected="true">مسجل من قبل</button>
@@ -139,7 +139,7 @@ body.showpriv #privacyView{display:block}
 </div>
 
 <div id="verifyView" hidden>
-<header>BOXIO</header>
+<header><img src="logo-black.png" alt="ZIVOX"></header>
 <main>
   <div class="vbox">
     <h2>تأكيد الإيميل</h2>
@@ -156,7 +156,7 @@ body.showpriv #privacyView{display:block}
 </div>
 
 <div id="profileView" hidden>
-<header>BOXIO</header>
+<header><img src="logo-black.png" alt="ZIVOX"></header>
 <main>
   <form id="profile" novalidate>
     <p id="p-title" style="margin:0 0 4px;font-weight:800;font-size:19px">كمّل بياناتك</p>
@@ -196,26 +196,23 @@ body.showpriv #privacyView{display:block}
     <button id="out" type="button">تسجيل خروج</button>
   </div>
   <section class="hero">
-    <svg viewBox="0 0 120 120" fill="none" stroke="#fff" stroke-width="6" stroke-linejoin="round" aria-hidden="true">
-      <path d="M60 8 104 32V82L60 108 16 82V32Z"/><path d="M16 32 60 56 104 32"/><path d="M60 56V108"/><path d="M38 20 82 44V58"/>
-    </svg>
-    <h1>BOXIO</h1>
+    <img src="logo-black.png" alt="ZIVOX">
     <p>Your shipping address</p>
   </section>
   <nav class="menu">
-    <a href="https://sigh2045-crypto.github.io/Boxio/featured-products.html">منتجات مختارة</a>
-    <a href="https://sigh2045-crypto.github.io/Boxio/addresses.html">العناوين</a>
+    <a href="featured-products.html">منتجات مختارة</a>
+    <a href="addresses.html">العناوين</a>
     <a href="https://m.shein.com/us/?ref=us&rep=dir&ret=mus">اضغط هنا لتفعيل خصم شي ان</a>
     <a href="#" id="m-edit">تعديل بياناتي</a>
   </nav>
 </div>
 
 <div id="privacyView">
-<header>BOXIO</header>
+<header><img src="logo-black.png" alt="ZIVOX"></header>
 <main><div class="pbox">
   <h1>سياسة الخصوصية</h1>
   <p class="date">آخر تحديث: تشرين الأول 2026</p>
-  <p>هاي الصفحة بتشرح شو البيانات اللي بنجمعها منك على موقع BOXIO، وليش، وكيف بنتعامل معها.</p>
+  <p>هاي الصفحة بتشرح شو البيانات اللي بنجمعها منك على موقع ZIVOX، وليش، وكيف بنتعامل معها.</p>
 
   <h2>البيانات اللي بنجمعها</h2>
   <ul>
