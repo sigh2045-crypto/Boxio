@@ -249,7 +249,7 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, se
 import { getFirestore, doc, getDoc, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 const firebaseConfig = { apiKey: "AIzaSyD8-5FFBCE5WHAEai3sPMAdUwAgIg-QaMQ", authDomain: "boxio-7bbde.firebaseapp.com", projectId: "boxio-7bbde", storageBucket: "boxio-7bbde.firebasestorage.app", messagingSenderId: "833134820214", appId: "1:833134820214:web:37083cab6980150e1e5857" };
 const app = initializeApp(firebaseConfig); const auth = getAuth(app); auth.languageCode = "ar"; const db = getFirestore(app);
-const SHEET_URL = "https://script.google.com/macros/s/AKfycbxnmzHuLmTftds_l6x2JOm4jK4k-zNpoNlCAluM1iDgLxp004Kvav-QbA2p3qM7zPw7/exec";
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbwJO9cS0r3jHfirDBXJ-ua8zE-KNsG9pSrdQIh-TmBH8UKWA5_P12eC0O-EAgsP8Ks8/exec";
 async function sendToSheet(d){ const user = auth.currentUser; if (!SHEET_URL || !user) return; try { const idToken = await user.getIdToken(); fetch(SHEET_URL, { method: "POST", mode: "no-cors", keepalive: true, headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ idToken, first:d.first, last:d.last, phone:d.phone, city:d.city, village:d.village, address:d.address, ref:d.ref, subscriptionNumber:d.subscriptionNumber }) }).catch(()=>{}); } catch(e) {} }
 const $ = id => document.getElementById(id); let busy=false;
 function show(tab){ const login=tab==="login"; $("login").hidden=!login; $("signup").hidden=login; $("t-login").setAttribute("aria-selected",login); $("t-signup").setAttribute("aria-selected",!login); }
