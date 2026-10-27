@@ -159,8 +159,8 @@ body.showpriv #privacyView{display:block}
 <header>BOXIO</header>
 <main>
   <form id="profile" novalidate>
-    <p style="margin:0 0 4px;font-weight:800;font-size:19px">كمّل بياناتك</p>
-    <p style="margin:0;color:var(--muted);font-size:14px">بنحتاجها لتوصيل طلباتك</p>
+    <p id="p-title" style="margin:0 0 4px;font-weight:800;font-size:19px">كمّل بياناتك</p>
+    <p id="p-sub" style="margin:0;color:var(--muted);font-size:14px">بنحتاجها لتوصيل طلباتك</p>
     <label for="p-first">الاسم الأول (بالإنجليزي)</label>
     <input class="ltr" id="p-first" autocomplete="given-name" required>
     <label for="p-last">اسم العائلة (بالإنجليزي)</label>
@@ -184,6 +184,7 @@ body.showpriv #privacyView{display:block}
     <input class="ltr" id="p-ref">
     <div class="msg" id="p-msg" role="alert"></div>
     <button class="go" type="submit">حفظ ومتابعة</button>
+    <button class="link" id="p-cancel" type="button" hidden>إلغاء</button>
     <button class="link" id="p-out" type="button">تسجيل خروج</button>
   </form>
 </main>
@@ -205,6 +206,7 @@ body.showpriv #privacyView{display:block}
     <a href="https://sigh2045-crypto.github.io/Boxio/featured-products.html">منتجات مختارة</a>
     <a href="https://sigh2045-crypto.github.io/Boxio/addresses.html">العناوين</a>
     <a href="https://m.shein.com/us/?ref=us&rep=dir&ret=mus">اضغط هنا لتفعيل خصم شي ان</a>
+    <a href="#" id="m-edit">تعديل بياناتي</a>
   </nav>
 </div>
 
@@ -318,6 +320,7 @@ try {
 // عرض صفحة الدخول أو الصفحة الرئيسية حسب حالة المستخدم
 let poll = null;
 let needProfile = false;
+let editMode = false;
 
 // المستخدم دخل بجوجل أول مرة وما عنده بيانات توصيل؟
 async function route(user){
@@ -345,9 +348,11 @@ function render(user){
   const verified = on && user.emailVerified;
   $("loginView").hidden = on;
   $("verifyView").hidden = !(on && !verified);
-  $("profileView").hidden = !(verified && needProfile);
-  $("home").hidden = !(verified && !needProfile);
-  document.body.classList.toggle("home", verified && !needProfile);
+  if (!verified) editMode = false;
+  const showProf = verified && (needProfile || editMode);
+  $("profileView").hidden = !showProf;
+  $("home").hidden = !(verified && !showProf);
+  document.body.classList.toggle("home", verified && !showProf);
   if (on && !verified) { $("v-mail").textContent = user.email; startPoll(); }
   else stopPoll();
   if (verified) {
@@ -484,13 +489,38 @@ $("profile").addEventListener("submit", async e => {
               city:$("p-city").value.trim(), village:$("p-village").value.trim(), address:$("p-addr").value.trim(), ref:$("p-ref").value.trim() };
   const btn = $("profile").querySelector(".go"); btn.disabled = true;
   try {
-    await setDoc(doc(db, "users", u.uid), { ...d, createdAt: serverTimestamp() });
+    await setDoc(doc(db, "users", u.uid), editMode ? { ...d, updatedAt: serverTimestamp() } : { ...d, createdAt: serverTimestamp() }, { merge: true });
     sendToSheet(d);
-    needProfile = false; render(u);
+    needProfile = false; setProfileMode(false); render(u);
   } catch(err) { console.error(err); m.textContent = "تعذّر حفظ البيانات، جرّب مرة ثانية"; }
   finally { btn.disabled = false; }
 });
 $("p-out").onclick = () => signOut(auth);
+
+// ===== تعديل البيانات (من الصفحة الرئيسية) =====
+function setProfileMode(edit){
+  editMode = edit;
+  $("p-title").textContent = edit ? "بياناتي" : "كمّل بياناتك";
+  $("p-sub").textContent = edit ? "عدّل اللي بدك وبعدين اضغط حفظ" : "بنحتاجها لتوصيل طلباتك";
+  $("p-cancel").hidden = !edit; $("p-out").hidden = edit;
+  $("p-ref").disabled = edit;
+  $("p-msg").textContent = "";
+}
+$("m-edit").onclick = async e => {
+  e.preventDefault();
+  const u = auth.currentUser; if (!u) return;
+  try {
+    const d = (await getDoc(doc(db, "users", u.uid))).data() || {};
+    const ph = (d.phone || "").replace(/^00/, "");
+    const cc = ["972","970"].find(c => ph.startsWith(c)) || "";
+    $("p-first").value = d.first || ""; $("p-last").value = d.last || "";
+    $("p-cc").value = cc; $("p-phone").value = ph.slice(cc.length);
+    $("p-city").value = d.city || ""; $("p-village").value = d.village || "";
+    $("p-addr").value = d.address || ""; $("p-ref").value = d.ref || "";
+  } catch(err) { console.error(err); }
+  setProfileMode(true); render(u); window.scrollTo(0, 0);
+};
+$("p-cancel").onclick = () => { setProfileMode(false); render(auth.currentUser); };
 
 // ===== شاشة تأكيد الإيميل =====
 $("v-check").onclick = async () => {
