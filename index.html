@@ -1,4 +1,10 @@
 <!DOCTYPE html>
+<!--
+ملاحظة لجوجل شيت (Apps Script): داخل doPost أضف رقم المشترك كعمود جديد:
+sheet.appendRow([ new Date(), data.subscriptionNumber, data.first, data.last, data.phone, data.city, data.village, data.address, data.ref ]);
+وأضف عنوان "رقم المشترك" بنفس الترتيب بأول صف بالشيت، وبعدها Deploy > Manage deployments > Edit > New version > Deploy.
+ملاحظة لـ Firestore: counters/subscription فيه حقل next (الرقم الجاي)، والقواعد لازم تسمح للمستخدم المسجّل بقراءته وزيادته واحد.
+-->
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
@@ -41,6 +47,8 @@ body.home{padding:0;background:#1e0a58}
 .hero{background:#000;text-align:center;padding:40px 16px 48px;line-height:0}
 .hero img{width:min(86vw,420px);aspect-ratio:560/115;height:auto}
 .hero p{margin:14px 0 0;font-size:22px;line-height:1.4;font-weight:400;font-family:Montserrat,Tajawal,system-ui,sans-serif;color:#e6e7ea}
+.sub{display:inline-block;margin-top:18px;padding:8px 18px;border:1px solid #4a4e57;border-radius:999px;font-size:16px;line-height:1.5;color:#e6e7ea}
+.sub b{color:var(--accent);font-weight:800;margin-inline-start:6px}
 .menu{padding:30px 16px 40px;display:flex;flex-direction:column;gap:22px;max-width:520px;margin:0 auto}
 .menu a{display:block;padding:20px 12px;background:#fff;color:#1e0a58;text-align:center;text-decoration:none;font-size:18px;border-radius:4px}
 .phone{display:flex;gap:8px;direction:ltr}
@@ -198,6 +206,7 @@ body.showpriv #privacyView{display:block}
   <section class="hero">
     <img class="logo" alt="ZIVOX">
     <p>Your shipping address</p>
+    <div class="sub" id="subno" hidden>رقم المشترك: <b id="subval"></b></div>
   </section>
   <nav class="menu">
     <a href="featured-products.html">منتجات مختارة</a>
@@ -220,6 +229,7 @@ body.showpriv #privacyView{display:block}
     <li>الاسم الأول واسم العائلة.</li>
     <li>رقم الهاتف.</li>
     <li>المدينة والقرية وتفاصيل العنوان.</li>
+    <li>رقم المشترك (يُنشأ تلقائياً عند التسجيل).</li>
     <li>كود الإحالة (إذا أدخلته).</li>
   </ul>
   <p>إذا دخلت بحساب جوجل، بنستلم من جوجل اسمك وبريدك الإلكتروني فقط. ما بنشوف كلمة سر حسابك في جوجل. وإذا سجلت بالإيميل، كلمة السر بتنحفظ مشفّرة عند Firebase وما بنقدر نشوفها.</p>
@@ -258,7 +268,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, setPersistence,
          browserLocalPersistence, browserSessionPersistence, onAuthStateChanged, sendPasswordResetEmail, signOut, sendEmailVerification, signInWithPopup, GoogleAuthProvider }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, serverTimestamp }
+import { getFirestore, doc, setDoc, getDoc, serverTimestamp, runTransaction }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -288,7 +298,8 @@ async function sendToSheet(d){
       method: "POST", mode: "no-cors", keepalive: true,
       headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify({ idToken, first:d.first, last:d.last, phone:d.phone,
-                             city:d.city, village:d.village, address:d.address, ref:d.ref })
+                             city:d.city, village:d.village, address:d.address, ref:d.ref,
+                             subscriptionNumber:d.subscriptionNumber })
     }).catch(() => {});
   } catch(e) { console.error(e); }
 }
@@ -322,12 +333,28 @@ try {
 let poll = null;
 let needProfile = false;
 let editMode = false;
+let curSub = null;
+
+// رقم المشترك: عدّاد تسلسلي (counters/subscription، الحقل next)
+async function nextSub(){
+  const ref = doc(db, "counters", "subscription");
+  return runTransaction(db, async tx => {
+    const s = await tx.get(ref);
+    const n = (s.exists() && Number(s.data().next)) || 10002;
+    tx.set(ref, { next: n + 1 });
+    return n;
+  });
+}
 
 // المستخدم دخل بجوجل أول مرة وما عنده بيانات توصيل؟
 async function route(user){
-  needProfile = false;
+  needProfile = false; curSub = null;
   if (user && user.emailVerified) {
-    try { needProfile = !(await getDoc(doc(db, "users", user.uid))).exists(); }
+    try {
+      const snap = await getDoc(doc(db, "users", user.uid));
+      needProfile = !snap.exists();
+      if (snap.exists()) curSub = snap.data().subscriptionNumber || null;
+    }
     catch(e) { console.error(e); needProfile = false; }
   }
   render(user);
@@ -356,6 +383,8 @@ function render(user){
   document.body.classList.toggle("home", verified && !showProf);
   if (on && !verified) { $("v-mail").textContent = user.email; startPoll(); }
   else stopPoll();
+  $("subno").hidden = !(verified && curSub);
+  $("subval").textContent = curSub || "";
   if (verified) {
     $("av").textContent = (user.email || "?").trim().charAt(0);
     $("mail").textContent = user.email;
@@ -398,12 +427,14 @@ async function doSignup(d){
   await setPersistence(auth, browserLocalPersistence);
   const cred = await createUserWithEmailAndPassword(auth, d.email, d.password);
   try { await sendVerify(cred.user); } catch(e) { console.error(e); }
-  sendToSheet(d);
   try {
+    d.subscriptionNumber = await nextSub();
     await setDoc(doc(db, "users", cred.user.uid), {
       email: d.email, first: d.first, last: d.last, phone: d.phone,
-      city: d.city, village: d.village, address: d.address, ref: d.ref, createdAt: serverTimestamp()
+      city: d.city, village: d.village, address: d.address, ref: d.ref,
+      subscriptionNumber: d.subscriptionNumber, createdAt: serverTimestamp()
     });
+    sendToSheet(d);
   } catch(e) {
     console.error(e);
     throw new Error("تم إنشاء حسابك لكن تعذّر حفظ بياناتك. سجّل دخول وجرّب مرة ثانية");
@@ -490,8 +521,10 @@ $("profile").addEventListener("submit", async e => {
               city:$("p-city").value.trim(), village:$("p-village").value.trim(), address:$("p-addr").value.trim(), ref:$("p-ref").value.trim() };
   const btn = $("profile").querySelector(".go"); btn.disabled = true;
   try {
+    d.subscriptionNumber = curSub || await nextSub();
     await setDoc(doc(db, "users", u.uid), editMode ? { ...d, updatedAt: serverTimestamp() } : { ...d, createdAt: serverTimestamp() }, { merge: true });
     sendToSheet(d);
+    curSub = d.subscriptionNumber;
     needProfile = false; setProfileMode(false); render(u);
   } catch(err) { console.error(err); m.textContent = "تعذّر حفظ البيانات، جرّب مرة ثانية"; }
   finally { btn.disabled = false; }
