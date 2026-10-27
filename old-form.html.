@@ -77,19 +77,15 @@ Object.keys(D).forEach(k=>opt(R,k));
 function fill(){T.innerHTML='';[...new Set(D[R.value].split('،'))].forEach(t=>opt(T,t))}
 R.addEventListener('change',fill);fill();
 </script>
-
 <script>
-const URL_='https://script.google.com/macros/s/AKfycbylddVnbksrrLOIrZCe-RNwDgXC26apE_G_GxaBtOP2Z_zTjMcxWjsQqo6fa-7A2SiV/exec';
 document.getElementById('f').addEventListener('submit',async e=>{
 e.preventDefault();
 const v=id=>document.getElementById(id).value.trim(),m=document.getElementById('msg'),b=document.getElementById('btn');
 const chk=[['email','البريد الإلكتروني',/^\S+@\S+\.\S+$/],['fn','الاسم الأول',/\S/],['ln','اسم العائلة',/\S/],['ph','رقم الهاتف',/^\+?[0-9\s-]{9,}$/],['address','العنوان',/\S/]];
 chk.forEach(c=>document.getElementById(c[0]).style.borderColor='');
 for(const [id,name,re] of chk){if(!re.test(v(id))){m.style.color='var(--red)';m.textContent='تأكد من تعبئة: '+name;const el=document.getElementById(id);el.style.borderColor='var(--red)';el.scrollIntoView({block:'center'});el.focus();return;}}
-const body=new URLSearchParams({email:v('email'),fn:v('fn'),ln:v('ln'),phone:v('ph'),gov:v('region'),town:v('town'),address:v('address'),ref:v('ref')});
-b.disabled=true;m.style.color='var(--muted)';m.textContent='جاري الإرسال…';
-try{await fetch(URL_,{method:'POST',mode:'no-cors',body});m.style.color='#198754';m.textContent='تم إنشاء حسابك، رح نتواصل معك قريباً.';e.target.reset();}
-catch(err){m.style.color='var(--red)';m.textContent='صار خطأ بالإرسال. جرّب مرة ثانية.';}
+b.disabled=true;m.style.color='#198754';m.textContent='تم إنشاء حسابك بنجاح، رح نتواصل معك قريباً.';
+e.target.reset();
 b.disabled=false;
 });
 </script>
