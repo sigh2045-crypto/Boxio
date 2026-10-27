@@ -60,6 +60,12 @@ body.home{padding:0;background:#1e0a58}
 .gwrap{padding:18px 18px 0}
 .gbtn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px;border:1px solid var(--line);border-radius:8px;background:#fff;color:#14213d;font:500 16px Tajawal,sans-serif;cursor:pointer}
 .gbtn:disabled{opacity:.6}
+.fbtn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;margin-top:10px;padding:13px;border:0;border-radius:8px;background:#1877f2;color:#fff;font:500 16px Tajawal,sans-serif;cursor:pointer}
+.fbtn:disabled{opacity:.6}
+.inapp{margin-top:12px;padding:12px;border:1px solid var(--line);border-radius:8px;font-size:14px;line-height:1.7}
+.inapp p{margin:0 0 6px}
+.inapp .go{margin-top:6px;padding:11px;font-size:15px}
+.inapp a.link{text-align:center}
 .or{display:flex;align-items:center;gap:10px;margin:16px 0 0;color:var(--muted);font-size:14px}
 .or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
 #privacyView{display:none}
@@ -95,7 +101,13 @@ body.showpriv #privacyView{display:block}
   </div>
   <div class="gwrap">
     <button class="gbtn" id="g-btn" type="button"><svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg><span>المتابعة بحساب جوجل</span></button>
+    <button class="fbtn" id="f-btn" type="button"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" fill="#fff"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg><span>المتابعة بحساب فيسبوك</span></button>
     <div class="msg" id="g-msg" role="alert"></div>
+    <div class="inapp" id="g-inapp" hidden>
+      <p>الدخول بجوجل أو فيسبوك ممكن ما يشتغل من داخل بعض التطبيقات (واتساب، إنستغرام، فيسبوك). افتح الرابط من المتصفح (كروم أو سفاري) وكمّل من هناك.</p>
+      <button class="go" id="g-copy" type="button">نسخ الرابط</button>
+      <a class="link" id="g-open" href="#" hidden>فتح في كروم</a>
+    </div>
     <div class="or">أو بالإيميل</div>
   </div>
   <form id="login" novalidate>
@@ -141,7 +153,7 @@ body.showpriv #privacyView{display:block}
     <div class="msg" id="s-msg" role="alert"></div>
     <button class="go" type="submit">إنشاء حساب</button>
   </form>
-  <p class="legal">بالتسجيل أو الدخول بجوجل، أنت بتوافق على <a href="#privacy">سياسة الخصوصية</a>.</p>
+  <p class="legal">بالتسجيل أو الدخول بجوجل أو فيسبوك، أنت بتوافق على <a href="#privacy">سياسة الخصوصية</a>.</p>
   <a class="wa" href="https://wa.me/972512006950">تواصل معنا عبر واتساب</a>
 </main>
 </div>
@@ -239,7 +251,7 @@ body.showpriv #privacyView{display:block}
     <li>رقم المشترك (يُنشأ تلقائياً عند التسجيل).</li>
     <li>كود الإحالة (إذا أدخلته).</li>
   </ul>
-  <p>إذا دخلت بحساب جوجل، بنستلم من جوجل اسمك وبريدك الإلكتروني فقط.</p>
+  <p>إذا دخلت بحساب جوجل أو فيسبوك، بنستلم منهم اسمك وبريدك الإلكتروني فقط.</p>
   <h2>ليش بنجمعها</h2>
   <ul>
     <li>إنشاء حسابك والتعرف عليك عند الدخول.</li>
@@ -264,24 +276,25 @@ body.showpriv #privacyView{display:block}
 <script>setTimeout(function(){var b=document.getElementById("boot");if(b&&!b.hidden){b.hidden=true;document.getElementById("loginView").hidden=false}},8000)</script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, setPersistence, browserLocalPersistence, browserSessionPersistence, onAuthStateChanged, sendPasswordResetEmail, signOut, sendEmailVerification, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, setPersistence, browserLocalPersistence, browserSessionPersistence, onAuthStateChanged, sendPasswordResetEmail, signOut, sendEmailVerification, signInWithPopup, GoogleAuthProvider, FacebookAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore, doc, getDoc, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 const firebaseConfig = { apiKey: "AIzaSyD8-5FFBCE5WHAEai3sPMAdUwAgIg-QaMQ", authDomain: "boxio-7bbde.firebaseapp.com", projectId: "boxio-7bbde", storageBucket: "boxio-7bbde.firebasestorage.app", messagingSenderId: "833134820214", appId: "1:833134820214:web:37083cab6980150e1e5857" };
 const app = initializeApp(firebaseConfig); const auth = getAuth(app); auth.languageCode = "ar"; const db = getFirestore(app);
 const SHEET_URL = "https://script.google.com/macros/s/AKfycbwJO9cS0r3jHfirDBXJ-ua8zE-KNsG9pSrdQIh-TmBH8UKWA5_P12eC0O-EAgsP8Ks8/exec";
 async function sendToSheet(d){ const user = auth.currentUser; if (!SHEET_URL || !user) return; try { const idToken = await user.getIdToken(); fetch(SHEET_URL, { method: "POST", mode: "no-cors", keepalive: true, headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ idToken, first:d.first, last:d.last, phone:d.phone, city:d.city, village:d.village, address:d.address, ref:d.ref, subscriptionNumber:d.subscriptionNumber }) }).catch(()=>{}); } catch(e) {} }
 const $ = id => document.getElementById(id); let busy=false;
+const okUser=u=>!!u&&(u.emailVerified||(!!u.email&&u.providerData.some(p=>p.providerId==="facebook.com")));
 function show(tab){ const login=tab==="login"; $("login").hidden=!login; $("signup").hidden=login; $("t-login").setAttribute("aria-selected",login); $("t-signup").setAttribute("aria-selected",!login); }
 $("t-login").onclick=()=>show("login"); $("t-signup").onclick=()=>show("signup");
 try{ const saved=localStorage.getItem("boxio_email"); if(saved){$("l-email").value=saved; $("l-remember").checked=true; } }catch(e){}
 let poll=null,needProfile=false,editMode=false,curSub=null;
 async function saveUser(uid,fields,existingSub,extra){ const cref=doc(db,"counters","subscription"),uref=doc(db,"users",uid); return runTransaction(db, async tx=>{ let sub=existingSub; if(!sub){ const s=await tx.get(cref); sub=(s.exists()&&Number(s.data().next))||10002; tx.set(cref,{next:sub+1}); } tx.set(uref,{...fields,subscriptionNumber:sub,...extra},{merge:true}); return sub; }); }
-async function route(user){ needProfile=false; curSub=null; if(user&&user.emailVerified){ try{ const snap=await getDoc(doc(db,"users",user.uid)); needProfile=!snap.exists(); if(snap.exists()) curSub=snap.data().subscriptionNumber||null; }catch(e){} } render(user); }
+async function route(user){ needProfile=false; curSub=null; if(okUser(user)){ try{ const snap=await getDoc(doc(db,"users",user.uid)); needProfile=!snap.exists(); if(snap.exists()) curSub=snap.data().subscriptionNumber||null; }catch(e){} } render(user); }
 function startPoll(){ if(poll) return; poll=setInterval(async()=>{ try{ if(!auth.currentUser) return; await auth.currentUser.reload(); if(auth.currentUser.emailVerified){stopPoll(); route(auth.currentUser);} }catch(e){} },4000); }
 function stopPoll(){ if(poll){clearInterval(poll); poll=null;} }
-function render(user){ $("boot").hidden=true; const on=!!user; const verified=on&&user.emailVerified; $("loginView").hidden=on; $("verifyView").hidden=!(on&&!verified); if(!verified) editMode=false; const showProf=verified&&(needProfile||editMode); $("profileView").hidden=!showProf; $("home").hidden=!(verified&&!showProf); document.body.classList.toggle("home",verified&&!showProf); if(on&&!verified){$("v-mail").textContent=user.email; startPoll();} else stopPoll(); $("subno").hidden=!(verified&&curSub); $("subval").textContent=curSub||""; if(verified){$("av").textContent=(user.email||"?").trim().charAt(0); $("mail").textContent=user.email;} }
+function render(user){ $("boot").hidden=true; const on=!!user; const verified=on&&okUser(user); $("loginView").hidden=on; $("verifyView").hidden=!(on&&!verified); if(!verified) editMode=false; const showProf=verified&&(needProfile||editMode); $("profileView").hidden=!showProf; $("home").hidden=!(verified&&!showProf); document.body.classList.toggle("home",verified&&!showProf); if(on&&!verified){$("v-mail").textContent=user.email; startPoll();} else stopPoll(); $("subno").hidden=!(verified&&curSub); $("subval").textContent=curSub||""; if(verified){$("av").textContent=(user.email||"?").trim().charAt(0); $("mail").textContent=user.email;} }
 onAuthStateChanged(auth,user=>{ if(!busy) route(user); }); $("out").onclick=()=>signOut(auth);
-const ERRORS={"auth/invalid-credential":"الإيميل أو الرقم السري غير صحيح","auth/user-not-found":"الإيميل أو الرقم السري غير صحيح","auth/wrong-password":"الإيميل أو الرقم السري غير صحيح","auth/invalid-email":"صيغة الإيميل غير صحيحة","auth/email-already-in-use":"هذا الإيميل مسجل من قبل","auth/weak-password":"الرقم السري ضعيف","auth/too-many-requests":"محاولات كثيرة"};
+const ERRORS={"auth/invalid-credential":"الإيميل أو الرقم السري غير صحيح","auth/user-not-found":"الإيميل أو الرقم السري غير صحيح","auth/wrong-password":"الإيميل أو الرقم السري غير صحيح","auth/invalid-email":"صيغة الإيميل غير صحيحة","auth/email-already-in-use":"هذا الإيميل مسجل من قبل","auth/weak-password":"الرقم السري ضعيف","auth/too-many-requests":"محاولات كثيرة","auth/account-exists-with-different-credential":"هذا الإيميل مسجل بطريقة دخول ثانية (جوجل أو إيميل). ادخل بنفس الطريقة اللي سجلت فيها","auth/popup-blocked":"المتصفح منع نافذة جوجل، اسمح بالنوافذ المنبثقة وجرّب مرة ثانية","auth/network-request-failed":"تأكد من اتصال الإنترنت وجرّب مرة ثانية"};
 const friendly=e=>ERRORS[e.code]||"صار خطأ، جرّب مرة ثانية";
 async function doLogin(email,password,remember){ await setPersistence(auth,remember?browserLocalPersistence:browserSessionPersistence); await signInWithEmailAndPassword(auth,email,password); }
 async function sendVerify(user){ const url=location.origin+location.pathname; try{ await sendEmailVerification(user,{url}); }catch(e){ await sendEmailVerification(user); } }
@@ -290,7 +303,12 @@ async function run(form,msgEl,fn){ const btn=form.querySelector(".go"); btn.disa
 $("login").addEventListener("submit",e=>{ e.preventDefault(); const email=$("l-email").value.trim(),pass=$("l-pass").value; if(!email||!pass){$("l-msg").textContent="أدخل البريد والرقم السري"; return;} const remember=$("l-remember").checked; try{ if(remember) localStorage.setItem("boxio_email",email); else localStorage.removeItem("boxio_email"); }catch(e){} run($("login"),$("l-msg"),()=>doLogin(email,pass,remember)); });
 $("l-forgot").addEventListener("click", async()=>{ const m=$("l-msg"),email=$("l-email").value.trim(); m.className="msg"; if(!email){m.textContent="اكتب إيميلك أولاً"; return;} try{ await sendPasswordResetEmail(auth,email); m.className="msg ok"; m.textContent="إذا الإيميل مسجل رح يوصلك رابط"; }catch(e){m.textContent=friendly(e);} });
 $("signup").addEventListener("submit",e=>{ e.preventDefault(); const m=$("s-msg"),p=$("s-pass").value; if(p.length<8){m.textContent="الرقم السري 8 خانات على الأقل"; return;} if(p!==$("s-pass2").value){m.textContent="الرقم السري غير متطابق"; return;} const cc=$("s-cc").value; if(!cc){m.textContent="اختر مقدمة الرقم"; return;} let digits=$("s-phone").value.replace(/\D/g,"").replace(/^0+/,""); if(digits.startsWith(cc)) digits=digits.slice(cc.length); if(!/^5\d{8}$/.test(digits)){m.textContent="رقم الجوال غير صحيح"; return;} run($("signup"),m,()=>doSignup({email:$("s-email").value.trim(),first:$("s-first").value.trim(),last:$("s-last").value.trim(),phone:"00"+cc+digits,city:$("s-city").value.trim(),village:$("s-village").value.trim(),address:$("s-addr").value.trim(),ref:$("s-ref").value.trim(),password:p})); });
-$("g-btn").onclick=async()=>{ const m=$("g-msg"),b=$("g-btn"); m.className="msg"; m.textContent=""; b.disabled=true; busy=true; try{ await signInWithPopup(auth,new GoogleAuthProvider()); busy=false; await route(auth.currentUser); }catch(e){ busy=false; if(e.code!=="auth/popup-closed-by-user") m.textContent=friendly(e); } finally{ b.disabled=false; } };
+const UA=navigator.userAgent||"";
+const inApp=/FBAN|FBAV|FB_IAB|Instagram|Messenger|Line\/|MicroMessenger|Snapchat|TikTok|musical_ly|Twitter/i.test(UA)||/; wv\)/.test(UA)||(/iPhone|iPad|iPod/.test(UA)&&!/Safari/i.test(UA));
+if(inApp&&/Android/i.test(UA)){ const o=$("g-open"); o.href="intent://"+location.host+location.pathname+location.search+"#Intent;scheme=https;package=com.android.chrome;end"; o.hidden=false; }
+$("g-copy").onclick=async()=>{ const m=$("g-msg"); try{ await navigator.clipboard.writeText(location.href); m.className="msg ok"; m.textContent="تم نسخ الرابط، الصقه بالمتصفح"; }catch(e){ prompt("انسخ الرابط وافتحه بالمتصفح",location.href); } };
+$("g-btn").onclick=async()=>{ const m=$("g-msg"),b=$("g-btn"); m.className="msg"; m.textContent=""; if(inApp){ $("g-inapp").hidden=false; return; } b.disabled=true; busy=true; try{ await signInWithPopup(auth,new GoogleAuthProvider()); busy=false; await route(auth.currentUser); }catch(e){ busy=false; if(e.code!=="auth/popup-closed-by-user"&&e.code!=="auth/cancelled-popup-request") m.textContent=friendly(e); } finally{ b.disabled=false; } };
+$("f-btn").onclick=async()=>{ const m=$("g-msg"),b=$("f-btn"); m.className="msg"; m.textContent=""; b.disabled=true; busy=true; try{ const p=new FacebookAuthProvider(); p.addScope("email"); const cred=await signInWithPopup(auth,p); if(!cred.user.email){ await signOut(auth); busy=false; await route(null); m.textContent="حساب فيسبوك هذا ما فيه إيميل. سجّل بالإيميل أو بجوجل"; return; } busy=false; await route(auth.currentUser); }catch(e){ busy=false; if(e.code==="auth/operation-not-supported-in-this-environment"){ $("g-inapp").hidden=false; } else if(e.code!=="auth/popup-closed-by-user"&&e.code!=="auth/cancelled-popup-request") m.textContent=friendly(e); } finally{ b.disabled=false; } };
 $("profile").addEventListener("submit", async e=>{ e.preventDefault(); const m=$("p-msg"),u=auth.currentUser; if(!u) return; const cc=$("p-cc").value; let digits=$("p-phone").value.replace(/\D/g,"").replace(/^0+/,""); if(digits.startsWith(cc)) digits=digits.slice(cc.length); const d={email:u.email,first:$("p-first").value.trim(),last:$("p-last").value.trim(),phone:"00"+cc+digits,city:$("p-city").value.trim(),village:$("p-village").value.trim(),address:$("p-addr").value.trim(),ref:$("p-ref").value.trim()}; const btn=$("profile").querySelector(".go"); btn.disabled=true; try{ d.subscriptionNumber=await saveUser(u.uid,d,curSub,editMode?{updatedAt:serverTimestamp()}:{createdAt:serverTimestamp()}); sendToSheet(d); curSub=d.subscriptionNumber; needProfile=false; setProfileMode(false); render(u); }catch(err){m.textContent="تعذّر حفظ البيانات";} finally{btn.disabled=false;}} );
 $("p-out").onclick=()=>signOut(auth);
 function setProfileMode(edit){ editMode=edit; $("p-title").textContent=edit?"بياناتي":"كمّل بياناتك"; $("p-cancel").hidden=!edit; $("p-back").hidden=!edit; $("p-out").hidden=edit; $("p-ref").disabled=edit; }
