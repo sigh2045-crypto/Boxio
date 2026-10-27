@@ -17,7 +17,10 @@
     });
     m[1].onAuthStateChanged(m[1].getAuth(app), function (user) {
       clearTimeout(timer);
-      if (user && user.emailVerified) root.style.visibility = "visible";
+      // الإيميل مأكّد، أو الدخول بفيسبوك (فيسبوك بيرجع إيميل مؤكَّد من عنده)
+      var ok = user && (user.emailVerified ||
+        (user.email && user.providerData.some(function (p) { return p.providerId === "facebook.com"; })));
+      if (ok) root.style.visibility = "visible";
       else back();
     });
   }).catch(back);
