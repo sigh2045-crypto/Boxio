@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>كم بتكلّف الشحنة؟ | ZIVOX</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  /* غيّر الألوان من هون لتطابق ألوان موقعك */
+  :root {
+    --bg: #eef1f6; --surface: #ffffff; --ink: #14213d; --muted: #5c6780;
+    --line: #d5dbe7; --accent: #f5b301; --brand: #1e0a58; --accent-soft: #fff6d9;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0e1424; --surface: #171f35; --ink: #f1f4fb; --muted: #9aa6c2;
+      --line: #2b3654; --brand: #f5b301; --accent-soft: #2a2a1e;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: "Tajawal", system-ui, sans-serif; line-height: 1.7;
+    padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px);
+  }
+  .wrap { max-width: 640px; margin: 0 auto; padding: 24px 18px 48px; }
+  .back { display: inline-block; color: var(--muted); text-decoration: none; font-weight: 500; margin-bottom: 18px; }
+  h1 { font-size: clamp(1.8rem, 6vw, 2.4rem); margin: 0 0 22px; font-weight: 800; }
+  h2 { font-size: 1.25rem; margin: 34px 0 12px; font-weight: 700; }
+
+  .prices { display: grid; gap: 10px; grid-template-columns: 1fr; }
+  @media (min-width: 520px) { .prices { grid-template-columns: repeat(3, 1fr); } }
+  .price { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+  .price .n { font-size: 2.1rem; font-weight: 800; line-height: 1.1; color: var(--brand); }
+  .price .n small { font-size: .95rem; font-weight: 500; color: var(--muted); margin-inline-start: 4px; }
+  .price .t { font-weight: 700; margin-top: 4px; }
+  .total { margin-top: 12px; background: var(--accent-soft); border-radius: 12px; padding: 13px 16px; }
+  .total strong { color: var(--brand); }
+
+  ol.steps { list-style: none; counter-reset: s; padding: 0; margin: 0; }
+  ol.steps li { counter-increment: s; position: relative; padding: 4px 48px 18px 0; font-weight: 500; }
+  ol.steps li::before {
+    content: counter(s); position: absolute; right: 0; top: 2px; width: 32px; height: 32px;
+    border-radius: 50%; background: var(--accent); color: #14213d; display: grid; place-items: center; font-weight: 700;
+  }
+  ol.steps li:not(:last-child)::after {
+    content: ""; position: absolute; right: 15px; top: 38px; bottom: 4px; width: 2px; background: var(--line);
+  }
+  .note { color: var(--muted); font-size: .95rem; margin-top: 8px; }
+  .cta { margin-top: 28px; display: flex; flex-wrap: wrap; gap: 10px; }
+  .btn { padding: 12px 22px; border-radius: 12px; font-weight: 700; text-decoration: none; }
+  .btn.primary { background: var(--accent); color: #14213d; }
+  .btn.ghost { border: 1px solid var(--line); color: var(--ink); background: var(--surface); }
+  .btn:focus-visible, .back:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <a class="back" href="/">→ رجوع</a>
+  <h1>كم بتكلّف الشحنة؟</h1>
+
+  <div class="prices">
+    <div class="price"><div class="n">20<small>شيكل</small></div><div class="t">عمولة الموقع</div></div>
+    <div class="price"><div class="n">20<small>شيكل</small></div><div class="t">توصيل للضفة</div></div>
+    <div class="price"><div class="n">10<small>شيكل</small></div><div class="t">استلام من العيزرية</div></div>
+  </div>
+  <div class="total">عن كل طرد: <strong>40 شيكل</strong> مع التوصيل، أو <strong>30 شيكل</strong> مع الاستلام من العيزرية.</div>
+  <p class="note">الأسعار رسوم خدمتنا فقط، بدون سعر المنتجات.</p>
+
+  <h2>كيف بتشتغل؟</h2>
+  <ol class="steps">
+    <li>سجّل عنا وخد عنوان ZIVOX بالقدس.</li>
+    <li>اطلب من أي موقع وادفع ببطاقتك الفيزا.</li>
+    <li>حط عنواننا كعنوان التوصيل.</li>
+    <li>بنستلم طردك وبنوصله إلك.</li>
+  </ol>
+
+  <div class="cta">
+    <a class="btn primary" href="/">ابدأ التسجيل</a>
+    <a class="btn ghost" href="https://wa.me/972512006950">واتساب</a>
+  </div>
+</main>
+</body>
+</html>
