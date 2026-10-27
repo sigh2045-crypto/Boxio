@@ -52,11 +52,24 @@ body.home{padding:0;background:#1e0a58}
 .vbox p{margin:0 0 6px;font-size:15px}
 .vbox b{display:block;margin:6px 0 12px;font-size:17px;direction:ltr;text-align:right;word-break:break-all}
 .vbox .hint{color:var(--muted);margin-bottom:8px}
+.legal{margin:0;padding:0 18px 14px;text-align:center;color:var(--muted);font-size:13px}
+.legal a{color:var(--muted)}
 .gwrap{padding:18px 18px 0}
 .gbtn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px;border:1px solid var(--line);border-radius:8px;background:#fff;color:#14213d;font:500 16px Tajawal,sans-serif;cursor:pointer}
 .gbtn:disabled{opacity:.6}
 .or{display:flex;align-items:center;gap:10px;margin:16px 0 0;color:var(--muted);font-size:14px}
 .or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+#privacyView{display:none}
+body.showpriv>div:not(#privacyView){display:none}
+body.showpriv #privacyView{display:block}
+#privacyView .pbox{padding:22px 20px}
+#privacyView h1{margin:0 0 4px;font-size:22px}
+#privacyView h2{margin:26px 0 6px;font-size:18px;border-inline-start:4px solid var(--accent);padding-inline-start:10px}
+#privacyView p,#privacyView li{margin:0 0 8px;font-size:16px;line-height:1.8}
+#privacyView ul{margin:0 0 8px;padding-inline-start:22px}
+#privacyView .date{color:var(--muted);font-size:14px}
+#privacyView a{color:var(--ink)}
+#privacyView .back{display:inline-block;margin-top:22px;font-weight:500}
 [hidden]{display:none}
 </style>
 </head>
@@ -120,6 +133,7 @@ body.home{padding:0;background:#1e0a58}
     <button class="go" type="submit">إنشاء حساب</button>
   </form>
 
+  <p class="legal">بالتسجيل أو الدخول بجوجل، أنت بتوافق على <a href="#privacy">سياسة الخصوصية</a>.</p>
   <a class="wa" href="https://wa.me/972512006950">تواصل معنا عبر واتساب</a>
 </main>
 </div>
@@ -192,6 +206,51 @@ body.home{padding:0;background:#1e0a58}
     <a href="https://sigh2045-crypto.github.io/Boxio/addresses.html">العناوين</a>
     <a href="https://m.shein.com/us/?ref=us&rep=dir&ret=mus">اضغط هنا لتفعيل خصم شي ان</a>
   </nav>
+</div>
+
+<div id="privacyView">
+<header>BOXIO</header>
+<main><div class="pbox">
+  <h1>سياسة الخصوصية</h1>
+  <p class="date">آخر تحديث: تشرين الأول 2026</p>
+  <p>هاي الصفحة بتشرح شو البيانات اللي بنجمعها منك على موقع BOXIO، وليش، وكيف بنتعامل معها.</p>
+
+  <h2>البيانات اللي بنجمعها</h2>
+  <ul>
+    <li>البريد الإلكتروني.</li>
+    <li>الاسم الأول واسم العائلة.</li>
+    <li>رقم الهاتف.</li>
+    <li>المدينة والقرية وتفاصيل العنوان.</li>
+    <li>كود الإحالة (إذا أدخلته).</li>
+  </ul>
+  <p>إذا دخلت بحساب جوجل، بنستلم من جوجل اسمك وبريدك الإلكتروني فقط. ما بنشوف كلمة سر حسابك في جوجل. وإذا سجلت بالإيميل، كلمة السر بتنحفظ مشفّرة عند Firebase وما بنقدر نشوفها.</p>
+
+  <h2>ليش بنجمعها</h2>
+  <ul>
+    <li>إنشاء حسابك والتعرف عليك عند الدخول.</li>
+    <li>توصيل طلباتك والتواصل معك بخصوصها.</li>
+    <li>احتساب مكافآت الإحالة إن وُجدت.</li>
+  </ul>
+
+  <h2>وين بتنحفظ بياناتك</h2>
+  <p>بنستخدم خدمات جوجل لتشغيل الموقع: Firebase (تسجيل الدخول وقاعدة البيانات Firestore) وجداول جوجل (Google Sheets) لتنظيم الطلبات. بياناتك بتنحفظ عند هالخدمات وبتخضع لشروطها وسياسة خصوصيتها.</p>
+
+  <h2>مع مين منشارك بياناتك</h2>
+  <p>ما بنبيع بياناتك ولا بنأجّرها لأي جهة. بنشارك فقط الحد الأدنى اللازم لتنفيذ طلبك (مثل بيانات التوصيل مع جهة الشحن)، وبنلتزم بالقانون إذا طُلب منا ذلك رسمياً.</p>
+
+  <h2>حقوقك</h2>
+  <p>بتقدر بأي وقت تطلب منا تعديل بياناتك أو حذفها أو تحصل على نسخة منها، عن طريق التواصل معنا على واتساب. وبنتعامل مع طلبك بأسرع وقت ممكن.</p>
+
+  <h2>الحماية</h2>
+  <p>بنستخدم إعدادات أمان تمنع أي مستخدم من الوصول لبيانات مستخدم ثاني. ومع هيك، ما في نظام آمن 100%، فبننصحك ما تشارك كلمة السر مع حدا.</p>
+
+  <h2>تعديل هذه السياسة</h2>
+  <p>ممكن نحدّث هالصفحة من وقت لوقت، وتاريخ آخر تحديث بيظهر بأولها.</p>
+
+  <h2>تواصل معنا</h2>
+  <p>لأي سؤال أو طلب بخصوص بياناتك: <a href="https://wa.me/972512006950">تواصل عبر واتساب</a>.</p>
+  <a class="back" href="#">← رجوع</a>
+</div></main>
 </div>
 
 <script type="module">
@@ -464,6 +523,15 @@ $("v-wrong").onclick = async () => {
 };
 
 $("v-out").onclick = () => signOut(auth);
+
+// صفحة سياسة الخصوصية: index.html#privacy
+function applyHash(){
+  const on = location.hash === "#privacy";
+  document.body.classList.toggle("showpriv", on);
+  if (on) window.scrollTo(0, 0);
+}
+addEventListener("hashchange", applyHash);
+applyHash();
 </script>
 </body>
 </html>
