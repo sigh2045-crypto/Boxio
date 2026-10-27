@@ -336,13 +336,18 @@ let editMode = false;
 let curSub = null;
 
 // رقم المشترك: عدّاد تسلسلي (counters/subscription، الحقل next)
-async function nextSub(){
-  const ref = doc(db, "counters", "subscription");
+// بيحفظ وثيقة المستخدم ورقم المشترك وزيادة العدّاد بعملية وحدة (متوافق مع قواعد Firestore)
+async function saveUser(uid, fields, existingSub, extra){
+  const cref = doc(db, "counters", "subscription"), uref = doc(db, "users", uid);
   return runTransaction(db, async tx => {
-    const s = await tx.get(ref);
-    const n = (s.exists() && Number(s.data().next)) || 10002;
-    tx.set(ref, { next: n + 1 });
-    return n;
+    let sub = existingSub;
+    if (!sub) {
+      const s = await tx.get(cref);
+      sub = (s.exists() && Number(s.data().next)) || 10002;
+      tx.set(cref, { next: sub + 1 });
+    }
+    tx.set(uref, { ...fields, subscriptionNumber: sub, ...extra }, { merge: true });
+    return sub;
   });
 }
 
@@ -428,12 +433,10 @@ async function doSignup(d){
   const cred = await createUserWithEmailAndPassword(auth, d.email, d.password);
   try { await sendVerify(cred.user); } catch(e) { console.error(e); }
   try {
-    d.subscriptionNumber = await nextSub();
-    await setDoc(doc(db, "users", cred.user.uid), {
+    d.subscriptionNumber = await saveUser(cred.user.uid, {
       email: d.email, first: d.first, last: d.last, phone: d.phone,
-      city: d.city, village: d.village, address: d.address, ref: d.ref,
-      subscriptionNumber: d.subscriptionNumber, createdAt: serverTimestamp()
-    });
+      city: d.city, village: d.village, address: d.address, ref: d.ref
+    }, null, { createdAt: serverTimestamp() });
     sendToSheet(d);
   } catch(e) {
     console.error(e);
@@ -521,8 +524,7 @@ $("profile").addEventListener("submit", async e => {
               city:$("p-city").value.trim(), village:$("p-village").value.trim(), address:$("p-addr").value.trim(), ref:$("p-ref").value.trim() };
   const btn = $("profile").querySelector(".go"); btn.disabled = true;
   try {
-    d.subscriptionNumber = curSub || await nextSub();
-    await setDoc(doc(db, "users", u.uid), editMode ? { ...d, updatedAt: serverTimestamp() } : { ...d, createdAt: serverTimestamp() }, { merge: true });
+    d.subscriptionNumber = await saveUser(u.uid, d, curSub, editMode ? { updatedAt: serverTimestamp() } : { createdAt: serverTimestamp() });
     sendToSheet(d);
     curSub = d.subscriptionNumber;
     needProfile = false; setProfileMode(false); render(u);
