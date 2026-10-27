@@ -79,6 +79,9 @@ body.showpriv #privacyView{display:block}
 #profileView{padding-bottom:90px}
 #profileView header,#verifyView header,#privacyView header{max-width:none;margin:0 -16px 14px;border-radius:0;padding:10px 16px;background:#05070d;border-bottom:1px solid #1b2a4a;display:flex;justify-content:flex-end;align-items:center;text-align:left}
 #profileView header img,#verifyView header img,#privacyView header img{height:44px;width:auto;max-width:none;display:block;border-radius:6px}
+#profileView header{position:relative}
+#p-back{position:absolute;right:16px;top:50%;transform:translateY(-50%);padding:8px 14px;border:1px solid #4a4e57;border-radius:8px;background:transparent;color:#fff;font:500 15px Tajawal,system-ui,sans-serif;cursor:pointer}
+#p-back:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 </style>
 </head>
 <body>
@@ -159,7 +162,7 @@ body.showpriv #privacyView{display:block}
 </main>
 </div>
 <div id="profileView" hidden>
-<header><img class="logo" alt="ZIVOX"></header>
+<header><button id="p-back" type="button" hidden>رجوع →</button><img class="logo" alt="ZIVOX"></header>
 <main>
   <form id="profile" novalidate>
     <p id="p-title" style="margin:0 0 4px;font-weight:800;font-size:19px">كمّل بياناتك</p>
@@ -287,9 +290,10 @@ $("signup").addEventListener("submit",e=>{ e.preventDefault(); const m=$("s-msg"
 $("g-btn").onclick=async()=>{ const m=$("g-msg"),b=$("g-btn"); m.className="msg"; m.textContent=""; b.disabled=true; busy=true; try{ await signInWithPopup(auth,new GoogleAuthProvider()); busy=false; await route(auth.currentUser); }catch(e){ busy=false; if(e.code!=="auth/popup-closed-by-user") m.textContent=friendly(e); } finally{ b.disabled=false; } };
 $("profile").addEventListener("submit", async e=>{ e.preventDefault(); const m=$("p-msg"),u=auth.currentUser; if(!u) return; const cc=$("p-cc").value; let digits=$("p-phone").value.replace(/\D/g,"").replace(/^0+/,""); if(digits.startsWith(cc)) digits=digits.slice(cc.length); const d={email:u.email,first:$("p-first").value.trim(),last:$("p-last").value.trim(),phone:"00"+cc+digits,city:$("p-city").value.trim(),village:$("p-village").value.trim(),address:$("p-addr").value.trim(),ref:$("p-ref").value.trim()}; const btn=$("profile").querySelector(".go"); btn.disabled=true; try{ d.subscriptionNumber=await saveUser(u.uid,d,curSub,editMode?{updatedAt:serverTimestamp()}:{createdAt:serverTimestamp()}); sendToSheet(d); curSub=d.subscriptionNumber; needProfile=false; setProfileMode(false); render(u); }catch(err){m.textContent="تعذّر حفظ البيانات";} finally{btn.disabled=false;}} );
 $("p-out").onclick=()=>signOut(auth);
-function setProfileMode(edit){ editMode=edit; $("p-title").textContent=edit?"بياناتي":"كمّل بياناتك"; $("p-cancel").hidden=!edit; $("p-out").hidden=edit; $("p-ref").disabled=edit; }
+function setProfileMode(edit){ editMode=edit; $("p-title").textContent=edit?"بياناتي":"كمّل بياناتك"; $("p-cancel").hidden=!edit; $("p-back").hidden=!edit; $("p-out").hidden=edit; $("p-ref").disabled=edit; }
 $("m-edit").onclick=async e=>{ e.preventDefault(); const u=auth.currentUser; if(!u) return; try{ const d=(await getDoc(doc(db,"users",u.uid))).data()||{}; const ph=(d.phone||"").replace(/^00/,""); const cc=["972","970"].find(c=>ph.startsWith(c))||""; $("p-first").value=d.first||""; $("p-last").value=d.last||""; $("p-cc").value=cc; $("p-phone").value=ph.slice(cc.length); $("p-city").value=d.city||""; $("p-village").value=d.village||""; $("p-addr").value=d.address||""; $("p-ref").value=d.ref||""; }catch(err){} setProfileMode(true); render(u); };
 $("p-cancel").onclick=()=>{ setProfileMode(false); render(auth.currentUser); };
+$("p-back").onclick=()=>{ setProfileMode(false); render(auth.currentUser); };
 $("v-check").onclick=async()=>{ try{ await auth.currentUser.reload(); }catch(e){} if(auth.currentUser&&auth.currentUser.emailVerified) route(auth.currentUser); else $("v-msg").textContent="لسا ما تأكد الإيميل"; };
 $("v-resend").onclick=async()=>{ if(!auth.currentUser) return; try{ await sendVerify(auth.currentUser); $("v-msg").textContent="تم إرسال الإيميل"; }catch(e){$("v-msg").textContent=friendly(e);} };
 $("v-wrong").onclick=async()=>{ const u=auth.currentUser; if(!u) return; if(!confirm("رح نحذف هالحساب؟")) return; try{ await u.delete(); }catch(e){ try{ await signOut(auth); }catch(_){} } show("signup"); };
